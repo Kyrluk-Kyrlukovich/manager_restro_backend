@@ -22,9 +22,9 @@ class OrdersController extends Controller
         $user = Auth::user();
         $root = $user->role()->first()->root()->first();
         $query = $request->get('tab');
-        $orders = Order::all();
+        $orders = Order::orderBy('created_at', 'desc')->get();
         if ($query && $query != 'view') {
-            $orders = Order::where('status', $query)->get();
+            $orders = Order::where('status', $query)->orderBy('created_at', 'desc')->get();
         }
 
         $orders = $orders->map(function ($order, $key) use ($user, $root) {
