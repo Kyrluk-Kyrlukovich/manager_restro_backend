@@ -75,11 +75,6 @@ class TablesController extends Controller
                             "read" => false,
                         ]);
                         event(new StoreNotificationEvent($message, $waiter));
-                        Notification::create([
-                            "message" => $message,
-                            "user" => $waiter->id,
-                            "read" => false,
-                        ]);
                     }
                 }
             } else {
