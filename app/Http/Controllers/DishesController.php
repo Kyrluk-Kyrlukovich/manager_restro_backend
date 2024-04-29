@@ -216,11 +216,6 @@ class DishesController extends Controller
                     "read" => false,
                 ]);
                 event(new StoreNotificationEvent($message, $chef));
-                Notification::create([
-                    "message" => $message,
-                    "user" => $chef->id,
-                    "read" => false,
-                ]);
             }
             return response()->json([
                 'data' => [
