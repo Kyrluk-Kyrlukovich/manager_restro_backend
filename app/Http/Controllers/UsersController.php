@@ -202,6 +202,7 @@ class UsersController extends Controller
                 'value' => $elem->role,
             ];
         });
+
         if ($id == $userAuth->id) {
             $role = $userAuth->role()->first();
             return response()->json([
@@ -235,7 +236,7 @@ class UsersController extends Controller
                         [
                             'code' => 'patronymic',
                             'type' => 'text',
-                            'value' => $userAuth->patronymic,
+                            'value' => !$userAuth->patronymic ? '' : $userAuth->patronymic,
                             'placeholder' => 'Ваше отчество',
                             'canEdit' => true,
                             'possibleValues' => null,
@@ -243,7 +244,7 @@ class UsersController extends Controller
                         [
                             'code' => 'roles',
                             'type' => 'select',
-                            'value' => $role->role,
+                            'value' => $role->id,
                             'placeholder' => 'Роль',
                             'canEdit' => $userAuth->roles == 1,
                             'possibleValues' => $roles,
@@ -303,7 +304,7 @@ class UsersController extends Controller
                         [
                             'code' => 'last_name',
                             'type' => 'text',
-                            'value' => $userAuth->last_name,
+                            'value' => $user->last_name,
                             'placeholder' => 'Ваша фамилия',
                             'canEdit' => $authRoot->canEditUsers,
                             'possibleValues' => null,
@@ -311,7 +312,7 @@ class UsersController extends Controller
                         [
                             'code' => 'patronymic',
                             'type' => 'text',
-                            'value' => $user->patronymic,
+                            'value' => !$user->patronymic ? '' : $user->patronymic,
                             'placeholder' => 'Ваше отчество',
                             'canEdit' => $authRoot->canEditUsers,
                             'possibleValues' => null,
@@ -319,7 +320,7 @@ class UsersController extends Controller
                         [
                             'code' => 'roles',
                             'type' => 'select',
-                            'value' => $role->role,
+                            'value' => $role->id,
                             'placeholder' => 'Роль',
                             'canEdit' => $userAuth->roles == 1,
                             'possibleValues' => $roles,
