@@ -74,6 +74,7 @@ Route::middleware('auth:sanctum')->group(function() {
     Route::put('/update-roots/{id}',     [\App\Http\Controllers\RolesController::class, 'updateRoot']);
     Route::post('/create-role',     [\App\Http\Controllers\RolesController::class, 'createRole']);
     Route::put('/update-role/{id}',     [\App\Http\Controllers\RolesController::class, 'updateRole']);
+    Route::delete('/delete-role/{id}',     [\App\Http\Controllers\RolesController::class, 'deleteRole']);
 //    ----------------------FORM---------------------
     Route::get('/get-form-users/{id}', [\App\Http\Controllers\UsersController::class, 'getFormUpdateUser']);
     Route::get('/get-form-create-user', [\App\Http\Controllers\UsersController::class, 'getFormCreateUser']);

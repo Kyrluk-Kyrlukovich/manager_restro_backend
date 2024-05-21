@@ -7,6 +7,7 @@ use App\Http\Requests\UpdateRoleRequest;
 use App\Http\Requests\UpdateRootsRequest;
 use App\Models\Role;
 use App\Models\Root;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 
 class RolesController extends Controller
@@ -211,4 +212,37 @@ class RolesController extends Controller
             ], 403);
         }
     }
+
+    public function deleteRole(string $id) {
+        $user = Auth::user();
+        $root = $user->role()->first()->root()->first();
+        if ($root->canWatchSettingsRolesTab) {
+            $checkUsersWithThatRole = User::where('roles', $id)->first();
+            if($checkUsersWithThatRole) {
+                return response()->json([
+                    'error' => [
+                        'code' => '403',
+                        'message' => 'Вы не можете удалить эту роль, так как есть сотрудники с такой ролью'
+                    ]
+                ], 403);
+            }
+            $role = Role::where('id', $id)->first();
+            $role->delete();
+            return response()->json([
+                'data' => [
+                    'code' => '200',
+                    'message' => 'Роль успешно удалена'
+                ]
+            ], 200);
+        } else {
+            return response()->json([
+                'error' => [
+                    'code' => '403',
+                    'message' => 'У вас недостаточно прав для удаления роли'
+                ]
+            ], 403);
+        }
+    }
 }
+
+

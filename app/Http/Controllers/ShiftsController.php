@@ -348,7 +348,7 @@ class ShiftsController extends Controller
                 return response()->json([
                     'error' => [
                         'code' => '403',
-                        'message' => 'Вы не можете удалить смену так как она уже началась',
+                        'message' => 'Вы не можете редактировать смену так как она уже началась',
                     ]
                 ], 403);
             }
