@@ -18,7 +18,7 @@ class ShiftsController extends Controller
     {
         $user = Auth::user();
         $root = $user->role()->first()->root()->first();
-        $shifts = Shift::all()->map(function ($shift, $key) use ($user) {
+        $shifts = Shift::orderBy('date_start', 'asc')->get()->map(function ($shift, $key) use ($user) {
             return [
                 'id' => $shift->id,
                 'name' => $shift->name,
