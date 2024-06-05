@@ -59,8 +59,8 @@ class ApexChartController extends Controller
                 foreach ($ordersForDay as $order) {
                     $sumForOrder = 0;
                     $orderDishes = $order->orderDishes()->get();
-                    foreach ($orderDishes as $orderDishes) {
-                        $sumForOrder += ((int) $orderDishes->sum);
+                    foreach ($orderDishes as $orderDishe) {
+                        $sumForOrder += ((int) $orderDishe->sum);
                     }
                     $sum += $sumForOrder;
                 }
