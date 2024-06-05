@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Dish;
 use App\Models\Order;
+use App\Models\Order_dish;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -105,5 +107,41 @@ class ApexChartController extends Controller
 
     private function getOnlyDate($date) {
        return Carbon::parse(Carbon::parse($date)->toDateString());
+    }
+
+    public function dataDishes(Request $request) {
+        $user = Auth::user();
+        $root = $user->role()->first()->root()->first();
+
+        $period = 7;
+
+        if ($request->get('period')) {
+            $period = (int) $request->get('period');
+        }
+
+        $startPeriod = $this->getOnlyDate(Carbon::now()->subDays($period));
+
+        $dishes = Dish::all();
+        $dishesCountByPeriod = array();
+        $labels = array();
+
+        foreach ($dishes as $dish) {
+            $orderDishes = Order_dish::where([['created_at', '>=',$startPeriod], ['dish_id', $dish->id]])->get();
+            $sum = 0;
+            foreach ($orderDishes as $orderDish) {
+                $sum += $orderDish->count;
+            }
+
+            $dishesCountByPeriod[] = $sum;
+            $labels[] = $dish->name;
+        }
+
+        return response()->json([
+            'data' => [
+                'labels' => $labels,
+                'dishesCountByPeriod' => $dishesCountByPeriod,
+                'period' => $period,
+            ]
+        ], 200);
     }
 }

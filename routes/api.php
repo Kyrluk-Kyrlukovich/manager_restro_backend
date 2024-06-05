@@ -16,12 +16,12 @@ use Illuminate\Support\Facades\Route;
 
 
 Route::match(['post'], '/login', [\App\Http\Controllers\UsersController::class, 'login']);
-Route::post('/signup', [\App\Http\Controllers\UsersController::class, 'signup']);
 
 
 Route::middleware('auth:sanctum')->group(function() {
 
 
+    Route::post('/signup', [\App\Http\Controllers\UsersController::class, 'signup']);
 
     Route::get('/notifications', [\App\Http\Controllers\NotificationController::class, 'index']);
     Route::get('/notifications/read', [\App\Http\Controllers\NotificationController::class, 'updateStatusRead']);
@@ -100,4 +100,6 @@ Route::middleware('auth:sanctum')->group(function() {
     //----------------------------CHARTS----------------------------------
 
     Route::get('/get-orders-costs-data', [\App\Http\Controllers\ApexChartController::class, 'dataOrdersAndCost']);
+    Route::get('/get-dishes-data', [\App\Http\Controllers\ApexChartController::class, 'dataDishes']);
+
 });

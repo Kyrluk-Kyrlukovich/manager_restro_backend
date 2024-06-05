@@ -28,7 +28,7 @@ class Order extends Model
     }
 
     public function dishes() {
-        return $this->belongsToMany(Dish::class,'order_dishes', 'order_id', 'dish_id');
+        return $this->belongsToMany(Dish::class,'order_dishes', 'order_id', 'dish_id')->withTimestamps();
     }
 
     public function orderDishes() {

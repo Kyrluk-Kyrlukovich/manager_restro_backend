@@ -81,7 +81,7 @@ class TablesController extends Controller
                 return response()->json([
                     'error' => [
                         'code' => '403',
-                        'message' => 'Стол с таким номер уже существует',
+                        'message' => 'Стол с таким номером уже существует',
                     ]
                 ], 403);
             }

@@ -18,19 +18,37 @@ class UsersController extends Controller
 {
     public function signup(SignupRequest $request)
     {
-        User::create(['password' => Hash::make($request->password)] + $request->validated());
+        $user = Auth::user();
+        $root = $user->role()->first()->root()->first();
+        if($root->canCreateUser) {
+            User::create(['password' => Hash::make($request->password)] + $request->validated());
+            return response()->json([
+                "data" => [
+                    "code" => "200",
+                    "message" => "Пользователь создан успешно"
+                ]
+            ], 200);
+        }
         return response()->json([
-            "data" => [
-                "code" => "200",
-                "message" => "Пользователь создан успешно"
+            "error" => [
+                "code" => "403",
+                "message" => "У вас недостаточно прав для создания пользователя"
             ]
-        ], 200);
+        ], 403);
     }
 
     public function login(LoginRequest $request)
     {
         if (Auth::attempt($request->only(['email', 'password']))) {
             $user = Auth::user();
+            if($user->status == 'dismissed') {
+                return response()->json([
+                    'error' => [
+                        'code' => '403',
+                        'message' => 'Ваш аккаунт не активен, так как вы были уволены'
+                    ]
+                ], 403);
+            }
             $user->tokens()->delete();
             $token = $user->createToken('api');
             return response()->json([
@@ -55,7 +73,7 @@ class UsersController extends Controller
         $request->session()->flush();
         return response()->json([
             'data' => [
-                'message' => 'Logout'
+                'message' => 'Вы успешно вышли зи аккаунта'
             ]
         ], 200);
     }
@@ -472,7 +490,7 @@ class UsersController extends Controller
             return response()->json([
                 'error' => [
                     'code' => '403',
-                    'message' => 'У вас недостаточно прав для увольнения пользователя'
+                        'message' => 'У вас недостаточно прав для восстановления пользователяв в статус "Работает"'
                 ]
             ], 403);
         }
