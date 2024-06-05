@@ -51,7 +51,15 @@ class OrdersController extends Controller
         });
         return response()->json([
             'data' => [
-                'orders' => $orders,
+                'orders' => $orders->map(function ($order) {
+                    $ordersDishes = Order_dish::where('order_id', $order['id'])->get();
+                    $sum = 0;
+                    foreach ($ordersDishes as $orderDish) {
+                        $sum += $orderDish->sum;
+                    }
+                    $order['sum'] = $sum;
+                    return $order;
+                }),
                 'actions' => $root->canEditOrders,
                 'tabs' => [
                     'active' => $query ? $query : 'view',
