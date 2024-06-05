@@ -6,6 +6,7 @@ use App\Events\StoreNotificationEvent;
 use App\Http\Requests\CreateShiftRequest;
 use App\Http\Requests\UpdateShiftRequest;
 use App\Models\Notification;
+use App\Models\Role;
 use App\Models\Shift;
 use App\Models\UserShift;
 use Carbon\Carbon;
@@ -26,7 +27,10 @@ class ShiftsController extends Controller
                 'date_end' => $shift->date_end,
                 'hours' => $shift->hours,
                 'count_staff' => $shift->count_staff,
-                'users' => $shift->users,
+                'users' => $shift->users->map(function ($user, $key) {
+                    $user->roleName = Role::where('id', $user->roles)->first()->role;
+                    return $user;
+                }),
                 'shift' => [
                     'active' => $shift->userShifts()->where('user', $user->id)->first() == null ? false : (bool)$shift->userShifts()->where('user', $user->id)->first()->active,
                     'freely' => count($shift->userShifts()->get()) < (int)$shift->count_staff,

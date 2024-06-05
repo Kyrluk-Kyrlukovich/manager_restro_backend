@@ -114,7 +114,16 @@ class ApexChartController extends Controller
         $root = $user->role()->first()->root()->first();
 
         $period = 7;
-
+        if(!$root->canViewDataDishes) {
+            return response()->json([
+                'data' => [
+                    'action' => 0,
+                    'labels' => [],
+                    'dishesCountByPeriod' => [],
+                    'period' => [],
+                ]
+            ], 200);
+        }
         if ($request->get('period')) {
             $period = (int) $request->get('period');
         }
@@ -138,6 +147,7 @@ class ApexChartController extends Controller
 
         return response()->json([
             'data' => [
+                'action' => 1,
                 'labels' => $labels,
                 'dishesCountByPeriod' => $dishesCountByPeriod,
                 'period' => $period,

@@ -98,20 +98,6 @@ class OrdersController extends Controller
         }
     }
 
-    private function getStatus($status)
-    {
-        switch ($status) {
-            case 'accept':
-                return "Принят";
-            case 'prepare':
-                return 'Готовоится';
-            case 'ready':
-                return 'Готов';
-            case 'passed':
-                return 'Завершен';
-        }
-    }
-
     public function getFormEdit(string $id)
     {
         $user = Auth::user();
@@ -119,7 +105,13 @@ class OrdersController extends Controller
         $order = Order::where('id', $id)->first();
 
         if ($root->canEditOrders) {
-            $usersResponse = User::where('roles', 2)->get()->map(function ($elem, $key) {
+
+            $usersResponse = User::all()->filter(function ($elem, $key) {
+                $roots = $elem->role()->first()->root()->first();
+
+                return ($roots->canBeResponsibleOrder);
+
+            })->map(function ($elem, $key) {
                 return [
                     'id' => $elem->id,
                     'code' => 'responsible',
@@ -127,7 +119,12 @@ class OrdersController extends Controller
                     'value' => $elem->first_name . " " . $elem->last_name,
                 ];
             });
-            $usersChef = User::where('roles', 3)->get()->map(function ($elem, $key) {
+            $usersChef = User::all()->filter(function ($elem, $key) {
+                $roots = $elem->role()->first()->root()->first();
+
+                return ($roots->canBeChefOrder);
+
+            })->map(function ($elem, $key) {
                 return [
                     'id' => $elem->id,
                     'code' => 'chef',
@@ -302,7 +299,7 @@ class OrdersController extends Controller
             });
 
             $usersForResponsible = User::all()->filter(function ($user) {
-                return (bool) $user->role()->first()->root()->first()->canBeResponsibleOrder;
+                return (bool)$user->role()->first()->root()->first()->canBeResponsibleOrder;
             });
             $usersResponse = $usersForResponsible->map(function ($elem, $key) {
                 return [
@@ -314,7 +311,7 @@ class OrdersController extends Controller
             });
 
             $usersForChef = User::all()->filter(function ($user) {
-                return (bool) $user->role()->first()->root()->first()->canBeChefOrder;
+                return (bool)$user->role()->first()->root()->first()->canBeChefOrder;
             });
             $usersChef = $usersForChef->map(function ($elem, $key) {
                 return [
@@ -403,7 +400,7 @@ class OrdersController extends Controller
                         [
                             'code' => 'dishes',
                             'type' => 'form',
-                            'value' =>  [['dish' => [
+                            'value' => [['dish' => [
                                 'id' => null,
                                 'code' => 'id',
                                 'type' => 'select',
@@ -456,8 +453,8 @@ class OrdersController extends Controller
             $order->dishes()->sync($newArr);
 
             //УВЕДОМЛЕНИЯ
-            $orderPath = $request->header('origin')."/orders#".$id;
-            if($order->responsible != $request->responsible) {
+            $orderPath = $request->header('origin') . "/orders#" . $id;
+            if ($order->responsible != $request->responsible) {
                 $newResponsible = User::where('id', $request->responsible)->first();
                 $oldResponsible = User::where('id', $order->responsible)->first();
                 $chef = User::where('id', $request->chef)->first();
@@ -481,7 +478,7 @@ class OrdersController extends Controller
                 ]);
                 event(new StoreNotificationEvent($message, $chef));
             }
-            if($order->chef != $request->chef) {
+            if ($order->chef != $request->chef) {
                 $newChef = User::where('id', $request->chef)->first();
                 $oldChef = User::where('id', $order->chef)->first();
                 $message = "Ответственный за приготовление заказа №$id изменен. <a class='a-notify' href='$orderPath'>Перейти в заказ</a>";
@@ -504,12 +501,12 @@ class OrdersController extends Controller
                 ]);
                 event(new StoreNotificationEvent($message, User::where('id', $request->responsible)->first()));
             }
-            if($order->status != $request->status) {
+            if ($order->status != $request->status) {
                 $newStatus = $this->getStatus($request->status);
                 $oldStatus = $this->getStatus($order->status);
                 $chef = User::where('id', $request->chef)->first();
                 $responsible = User::where('id', $request->responsible)->first();
-                $message = "Статус заказа №$id был изменен с <strong>«".$oldStatus."»</strong> на <strong>«".$newStatus."»</strong>. <a class='a-notify' href='$orderPath'>Перейти в заказ</a>";
+                $message = "Статус заказа №$id был изменен с <strong>«" . $oldStatus . "»</strong> на <strong>«" . $newStatus . "»</strong>. <a class='a-notify' href='$orderPath'>Перейти в заказ</a>";
                 Notification::create([
                     "message" => $message,
                     "user" => $chef->id,
@@ -528,7 +525,7 @@ class OrdersController extends Controller
                 'data' => [
                     'code' => '200',
                     'message' => 'Заказ успешно обновлен',
-                    'leeee' => $request->header('origin')."/orders#".$id,
+                    'leeee' => $request->header('origin') . "/orders#" . $id,
                 ]
             ], 200);
         } else {
@@ -541,7 +538,22 @@ class OrdersController extends Controller
         }
     }
 
-    public function getOrderDishes(string $id) {
+    private function getStatus($status)
+    {
+        switch ($status) {
+            case 'accept':
+                return "Принят";
+            case 'prepare':
+                return 'Готовоится';
+            case 'ready':
+                return 'Готов';
+            case 'passed':
+                return 'Завершен';
+        }
+    }
+
+    public function getOrderDishes(string $id)
+    {
         $user = Auth::user();
         $order = Order::where('id', $id)->first();
         $dishes = Order_dish::where('order_id', $order->id)->get()->map(function ($elem, $key) {

@@ -31,5 +31,6 @@ class Root extends Model
         "canBeChefOrder",
         "canWatchSettingsRolesTab",
         "canCreateUser",
+        "canViewDataDishes",
     ];
 }
