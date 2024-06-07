@@ -32,8 +32,8 @@ class ApexChartController extends Controller
         }
 
         for ($i = 0; $i < $periodOrders; $i++) {
-            $day = $this->getOnlyDate(Carbon::now()->subDays($periodOrders - $i));
-            $nextDay = $this->getOnlyDate(Carbon::now()->subDays($periodOrders - $i - 1));
+            $day = $this->getOnlyDate(Carbon::now()->subDays($periodOrders - $i - 1));
+            $nextDay = $this->getOnlyDate(Carbon::now()->subDays($periodOrders - $i - 2));
             if($periodOrders > 7) {
                 $daysOfWeekCost[] = $day->format('d.m.y');
             } else {
@@ -44,8 +44,8 @@ class ApexChartController extends Controller
         }
 
         for($i = 0; $i < $periodIncome; $i++) {
-            $day = $this->getOnlyDate(Carbon::now()->subDays($periodIncome - $i));
-            $nextDay = $this->getOnlyDate(Carbon::now()->subDays($periodIncome - $i - 1));
+            $day = $this->getOnlyDate(Carbon::now()->subDays($periodIncome - $i - 1));
+            $nextDay = $this->getOnlyDate(Carbon::now()->subDays($periodIncome - $i - 2));
             if($periodIncome > 7) {
                 $daysOfWeekCountOrders[] = $day->format('d.m.y');
             } else {
